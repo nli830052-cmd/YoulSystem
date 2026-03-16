@@ -1,24 +1,30 @@
 import os
 import json
+import re
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.prebuilt import create_react_agent
 from langchain.tools import tool
 
 from langchain_core.messages import HumanMessage
-from rag_pipeline import build_rag_db
+from rag_pipeline import load_rag_db
+from dotenv import load_dotenv
 
 # ==========================================
-# 🛑 중요: 여기에 Gemini API 키를 입력하세요! (Google AI Studio에서 무료 발급 가능)
+# 🛑 중요: 루트 디렉토리의 .env 파일에서 Gemini API 키를 자동으로 불러옵니다.
 # ==========================================
-os.environ["GOOGLE_API_KEY"] = "AIzaSyAMuHYvCcADicZVo00CHdocDsQESgGnAOs" # 이곳을 지우고 본인의 Gemini API 키를 붙여넣으세요!
+load_dotenv(override=True) # .env 파일 로딩 (기존 터미널 캐시를 무시하고 덮어쓰기)
+
+if not os.environ.get("GOOGLE_API_KEY"):
+    raise ValueError("🚨 환경 변수에 'GOOGLE_API_KEY'가 설정되지 않았습니다. .env 파일을 확인해주세요.")
 
 # 1. RAG (문서 검색) 시스템 연동
 print("🚀 [1단계] RAG 지식 데이터베이스 로딩 중...")
-vectorstore = build_rag_db()
+vectorstore = load_rag_db()
 if vectorstore is None:
     raise Exception("Vector DB(Chroma)에 접속할 수 없습니다. RAG 파이프라인부터 다시 실행해주세요.")
 
-rag_retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
+# 1차망: 벡터 유사도 검색으로 여유있게 후보군 10개를 넉넉히 가져옵니다.
+rag_retriever = vectorstore.as_retriever(search_kwargs={"k": 10})
 
 # ==========================================
 # 2. 요원의 도구(Tool) 정의 (MCP 기반 제어 흉내내기)
@@ -39,8 +45,32 @@ def search_maintenance_manual(query: str) -> str:
     """
     [지식 검색 도구] 설비의 고장 대처법, 조치 메뉴얼, 3D 좌표 등을 알고 싶을 때 무조건 가장 먼저 이 도구를 사용하여 검색하세요.
     """
+    # 1. 벡터 검색 (의미 기반) - 10개 확보
     docs = rag_retriever.invoke(query)
-    return "\n".join([doc.page_content for doc in docs])
+    
+    # 2. 정규표현식(Regex)을 이용한 고유 설비 번호 추출 (예: t-101, V-102, HX-105 등 소문자 포함)
+    # 패턴: [영대문자/소문자 1~2개]-[숫자 3자리] -> 사용자 입력이 1구역 t-101 이어도 감지 가능
+    equip_id_match = re.search(r'[a-zA-Z]{1,2}-\d{3}', query)
+    
+    if equip_id_match:
+        # 매뉴얼 원본 문서에는 'T-101'처럼 무조건 대문자로 적혀 있으므로, 
+        # 추출한 소문자 문자열(예: 't-101')을 .upper()를 이용해 대문자('T-101')로 강제 변환
+        target_id = equip_id_match.group().upper()
+        
+        # 3. 하이브리드 재정렬 (Re-ranking): 추출된 키워드(T-101 등)가 실제로 본문에 있는 문서만 최우선으로 올림
+        exact_match_docs = [doc for doc in docs if target_id in doc.page_content]
+        other_docs = [doc for doc in docs if target_id not in doc.page_content]
+        
+        # 키워드 일치 문서를 상단에 배치하고, 나머지는 뒤로 붙임
+        sorted_docs = exact_match_docs + other_docs
+        
+        # 최종적으로 상위 3개만 AI에게 전달하여 혼란(환각)을 방지
+        final_docs = sorted_docs[:3]
+    else:
+        # 설비 번호가 없는 일반적인 질문이면 원래 벡터 검색 점수대로 상위 3개만 전달
+        final_docs = docs[:3]
+        
+    return "\n\n".join([doc.page_content for doc in final_docs])
 
 @tool
 def get_equipment_status(equipment_id: str) -> str:
@@ -51,6 +81,18 @@ def get_equipment_status(equipment_id: str) -> str:
     if equipment_id in db:
         return json.dumps(db[equipment_id], ensure_ascii=False)
     return f"오류: {equipment_id} 설비를 찾을 수 없습니다."
+
+@tool
+def get_all_equipment_summary() -> str:
+    """
+    [ERP 시스템 도구] 전체 장비의 기본 정보(ID, 이름, 상태, 최근 점검일 등) 목록을 한 번에 조회합니다.
+    "특정 날짜에 점검된 장비를 찾아줘" 또는 "수리 중인 장비를 모두 알려줘"와 같이 전체 현황을 파악해야 할 때 이 도구를 사용하세요.
+    """
+    db = _read_json(ERP_DB_PATH)
+    summary = []
+    for eq_id, info in db.items():
+        summary.append(f"- ID: {eq_id} | 이름: {info.get('name')} | 상태: {info.get('status')} | 최근 점검일: {info.get('last_checked')}")
+    return "\n".join(summary)
 
 @tool
 def update_equipment_status(equipment_id: str, new_status: str) -> str:
@@ -82,17 +124,28 @@ def set_3d_camera_focus(coords: str) -> str:
 
 # 3. 브레인(LLM) 및 에이전트 결합
 print("🚀 [2단계] AI Agent 두뇌 활성화 중...")
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-pro", temperature=0)
+llm = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0)
 
-# 에이전트에게 4가지 손발(도구)을 달아줍니다.
+# 에이전트에게 5가지 손발(도구)을 달아줍니다.
 tools = [
     search_maintenance_manual, 
     get_equipment_status, 
+    get_all_equipment_summary,
     update_equipment_status, 
     set_3d_camera_focus
 ]
 
-# 스스로 생각하고(Thought) 행동(Action)할 수 있는 ReAct 구조의 에이전트 생성
+# AI가 환각(Hallucination)을 일으키지 못하도록 강력한 가드레일(시스템 프롬프트)을 작성합니다.
+SYSTEM_PROMPT = """
+당신은 율시스템(YoulSystem)의 I3D 플랜트 유지보수 AI Copilot입니다.
+다음의 규칙을 '절대적'으로 준수해야 합니다:
+1. [환각 방지]: 당신이 가진 도구(Tool)를 사용해서 얻은 결과값에 없는 정보는 절대 유추하거나 지어내지 마세요.
+2. 만약 도구를 사용했는데도 원하는 설비나 데이터가 존재하지 않는다면, 
+   반드시 "현재 시스템 데이터 상에 해당 정보가 존재하지 않습니다." 또는 "모르겠습니다."라고 있는 그대로만 대답하세요.
+3. 임의의 날짜, 수치, 조치 방법을 인터넷에서 학습한 사전 지식으로 마음대로 채워 넣으면 대형 사고가 발생합니다.
+"""
+
+# 스스로 생각하고(Thought) 행동(Action)할 수 있는 ReAct 구조의 에이전트 생성 (버전 충돌 방지를 위해 인자 제거)
 agent_executor = create_react_agent(llm, tools)
 
 # 4. 모의 상황 실행 (사용자 명령)
@@ -107,8 +160,12 @@ if __name__ == "__main__":
     print(f"👤 작업자 명령: {user_prompt}\n")
     print("="*20 + " [AI 에이전트의 자율 문제 해결(Reasoning & Action)] " + "="*20)
     
-    # 에이전트 실행!
-    response = agent_executor.invoke({"messages": [HumanMessage(content=user_prompt)]})
+    # 에이전트 실행! (대화 기록 맨 앞에 시스템 프롬프트를 시스템 메시지로 삽입)
+    from langchain_core.messages import SystemMessage
+    response = agent_executor.invoke({"messages": [
+        SystemMessage(content=SYSTEM_PROMPT),
+        HumanMessage(content=user_prompt)
+    ]})
     
     print("\n" + "="*50)
     print("💡 [최종 AI 답변]")
