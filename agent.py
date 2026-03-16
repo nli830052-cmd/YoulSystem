@@ -124,7 +124,7 @@ def set_3d_camera_focus(coords: str) -> str:
 
 # 3. 브레인(LLM) 및 에이전트 결합
 print("🚀 [2단계] AI Agent 두뇌 활성화 중...")
-llm = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0)
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-pro", temperature=0)
 
 # 에이전트에게 5가지 손발(도구)을 달아줍니다.
 tools = [

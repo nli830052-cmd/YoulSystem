@@ -36,7 +36,7 @@
   },
   "V-103": {
     "name": "1구역 밸브 3호기",
-    "status": "정상",
+    "status": "수리 중",
     "pressure": 29.4,
     "flow_rate": 32.0,
     "last_checked": "2026-03-16"
