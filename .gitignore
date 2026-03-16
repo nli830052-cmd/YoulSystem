@@ -21,3 +21,4 @@ env/
 # Project Specific (Data & Vector DB)
 # Note: JSON mock files and manuals are kept, but the compiled ChromaDB vector store is ignored
 data/chroma_db/
+C:\YoulSystem\.env
