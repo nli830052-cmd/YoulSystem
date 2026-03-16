@@ -26,7 +26,18 @@
 
 ---
 
+## 📸 시연 시나리오 (Demo Scenarios)
+
+| 시나리오 01. 매뉴얼 지식 검색 | 시나리오 02. 시스템 통합 제어 | 시나리오 03. 안전한 예외 처리 |
+| :---: | :---: | :---: |
+| ![Scenario 1](demo/scenario1.gif) | ![Scenario 2](demo/scenario2.gif.gif) | ![Scenario 3](demo/scenario3.gif.gif) |
+| **V-103 매뉴얼 정보 제공** | **시스템 이상 및 자동 조치** | **데이터 부재 및 예외 대응** |
+| RAG 파이프라인을 통해 방대한 매뉴얼에서 V-103 설비의 상세 조치법을 정확히 찾아냅니다. | 온도 이상 발생 시, AI가 매뉴얼을 검색하고 ERP 상태 갱신 및 3D 뷰어를 자동으로 연동합니다. | 최근 점검 날짜를 확인했으나 시스템에 해당 기록이 없을 때, 환각 없이 정보가 없음을 명확히 안내합니다. |
+
+---
+
 ## 🛠️ 기술 스택 (Tech Stack)
+
 
 ### **Core AI Engine**
 * **LLM:** Google `Gemini 2.5 Pro` (via `langchain-google-genai`)

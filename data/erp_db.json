@@ -15,7 +15,7 @@
   },
   "T-103": {
     "name": "1구역 가스터빈 3호기",
-    "status": "정상",
+    "status": "점검 요망",
     "temperature": 40.6,
     "rpm": 68.6,
     "last_checked": "2026-03-15"
