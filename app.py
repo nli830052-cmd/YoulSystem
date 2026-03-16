@@ -111,7 +111,7 @@ with col2:
         ]
 
     # 채팅창(높이 고정)
-    chat_container = st.container(height=400)
+    chat_container = st.container(height=600)
     for msg in st.session_state.messages:
         with chat_container.chat_message(msg["role"]):
             st.markdown(msg["content"])
