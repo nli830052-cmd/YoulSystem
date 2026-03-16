@@ -8,10 +8,15 @@ from langchain.tools import tool
 from langchain_core.messages import HumanMessage
 from rag_pipeline import load_rag_db
 
+from dotenv import load_dotenv
+
 # ==========================================
-# 🛑 중요: 여기에 Gemini API 키를 입력하세요! (Google AI Studio에서 무료 발급 가능)
+# 🛑 중요: 루트 디렉토리의 .env 파일에서 Gemini API 키를 자동으로 불러옵니다.
 # ==========================================
-os.environ["GOOGLE_API_KEY"] = "AIzaSyAMuHYvCcADicZVo00CHdocDsQESgGnAOs" # 이곳을 지우고 본인의 Gemini API 키를 붙여넣으세요!
+load_dotenv() # .env 파일 로딩
+
+if not os.environ.get("GOOGLE_API_KEY"):
+    raise ValueError("🚨 환경 변수에 'GOOGLE_API_KEY'가 설정되지 않았습니다. .env 파일을 확인해주세요.")
 
 # 1. RAG (문서 검색) 시스템 연동
 print("🚀 [1단계] RAG 지식 데이터베이스 로딩 중...")
