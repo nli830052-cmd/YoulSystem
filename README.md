@@ -1,6 +1,6 @@
-# 🏭 율시스템 I3D 플랜트 유지보수 AI Copilot 
+# 🏭 율시스템 I3D 플랜트 유지보수 AI Copilot
 
-![Streamlit UI Concept](https://img.shields.io/badge/Streamlit-UI-FF4B4B.svg?style=flat&logo=streamlit&logoColor=white) 
+![Streamlit UI Concept](https://img.shields.io/badge/Streamlit-UI-FF4B4B.svg?style=flat&logo=streamlit&logoColor=white)
 ![LangChain](https://img.shields.io/badge/LangChain-ReAct_Agent-1C3C3C.svg?style=flat&logo=langchain&logoColor=white)
 ![Gemini 2.5 Pro](https://img.shields.io/badge/Gemini-2.5_Pro-8E75B2.svg?style=flat&logo=google&logoColor=white)
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_DB-FF9D00.svg?style=flat&logo=chroma&logoColor=white)
@@ -29,33 +29,38 @@
 ## 📸 시연 시나리오 (Demo Scenarios)
 
 ### 1. 매뉴얼 지식 검색 및 조치 (T-101 설비 매뉴얼)
-![Scenario 1](demo/scenario1.gif.gif)
+
+<img src="demo/scenario1.gif.gif" width="100%">
 - **설명:** T-101 설비의 이상 징후에 대해 RAG 파이프라인에서 매뉴얼을 검색하고, 추출된 지식에 따라 점검 절차 및 조치 사항을 안내합니다.
 
 ### 2. 시스템 통합 제어 (최근 점검 날짜 확인)
-![Scenario 2](demo/scenario2.gif.gif)
+
+<img src="demo/scenario2.gif.gif" width="100%">
 - **설명:** 현재 가동 중인 설비들의 최근 점검 날짜를 시스템(ERP)에서 실시간으로 조회하여 작업자에게 보고합니다.
 
 ### 3. 데이터 부재 및 예외 대응 (방어 로직)
-![Scenario 3](demo/scenario3.gif.gif)
+
+<img src="demo/scenario3.gif.gif" width="100%">
 - **설명:** 특정 설비에 대한 점검 기록이 없거나 조회되지 않는 경우, AI가 환각 없이 정확히 데이터 부재를 알리고 후속 조치를 제안합니다.
 
 ---
 
 ## 🛠️ 기술 스택 (Tech Stack)
 
-
 ### **Core AI Engine**
+
 * **LLM:** Google `Gemini 2.5 Pro` (via `langchain-google-genai`)
 * **Agent Framework:** `LangGraph` (`create_react_agent`)
 * **Memory Management:** `SystemMessage`, `HumanMessage` 기반 전체 대화 컨텍스트 유지 기능
 
 ### **RAG (지식 검색 파이프라인)**
+
 * **Vector DB:** `ChromaDB` (로컬 기반 DB 파일 구축)
 * **Embedding Model:** HuggingFace `jhgan/ko-sroberta-multitask` (가볍고 빠른 한국어 최적화 모델)
 * **Text Splitter:** `CharacterTextSplitter` (300토큰 사이즈, 50 오버랩 청킹)
 
 ### **Frontend & Data**
+
 * **Web UI:** `Streamlit` (커스텀 CSS, Metric 컴포넌트 활용 다이나믹 뷰어)
 * **Mock DB System:** `.json` 베이스의 로컬 파일 입출력으로 사내 시스템 모사 (`app.py`, `agent.py`)
 
@@ -68,7 +73,7 @@ graph TD;
     User((작업자)) -->|명령 입력| UI[Streamlit Web UI]
     UI -->|대화 기록 전달| Agent[LangGraph ReAct Agent]
     Agent -->|1. LLM 판단| LLM((Gemini-2.5-Pro))
-    
+  
     subgraph "AI 도구 상자 (Tools)"
         Agent --호출--> Tool1[get_equipment_status]
         Agent --호출--> Tool2[get_all_equipment_summary]
@@ -76,11 +81,11 @@ graph TD;
         Agent --호출--> Tool4[update_equipment_status]
         Agent --호출--> Tool5[set_3d_camera_focus]
     end
-    
+  
     Tool1 & Tool2 & Tool4 <--> |JSON API 제어| ERP[(가상 ERP DB)]
     Tool3 <--> |하이브리드 유사도 검색| RAG[(Chroma Vector DB)]
     Tool5 <--> |JSON API 제어| 3D[(3D 뷰어 상태)]
-    
+  
     ERP & 3D -.-> |실시간 연동 데이터| UI
     Agent -->|최종 자연어 답변| UI
 ```
@@ -92,6 +97,7 @@ graph TD;
 본 프로젝트는 윈도우(Windows) 가상환경(`venv`) 기반으로 구축되었습니다.
 
 ### 1단계: 프로젝트 환경 구축
+
 ```cmd
 # 저장소 및 프로젝트 폴더 이동
 cd C:\YoulSystem
@@ -107,37 +113,47 @@ pip install langchain-community sentence-transformers chromadb
 ```
 
 ### 2단계: API 보안 키 설정
+
 루트 디렉토리(`C:\YoulSystem\`) 최상단에 `.env` 파일을 생성하고 발급받은 Gemini API 키를 기입하세요.
+
 ```env
 # .env 파일 생성 후 기재
 GOOGLE_API_KEY=당신의_제미나이_API_키_입력
 ```
 
 ### 3단계: RAG 지식 데이터베이스 구축 (최초 1회 필수)
+
 터미널에서 아래 명령을 통해 `turbine_manual.txt` 매뉴얼을 잘게 쪼개어 로컬 Chroma DB(`data/chroma_db/`)를 생성합니다.
 *(주의! DB가 생성되어야 AI가 지식 검색을 시작할 수 있습니다.)*
+
 ```cmd
 python rag_pipeline.py
 ```
 
 ### 4단계: Streamlit 서버 구동 (실행)
+
 모든 준비가 완료되었다면 에이전트를 스트림릿 웹 화면으로 띄웁니다!
+
 ```cmd
 streamlit run app.py
 ```
+
 > 브라우저가 열리면 우측 챗봇 창에서 **"오늘 점검해야 할 설비를 알려줘"** 또는 **"T-101의 온도가 80도인데 조치해줘"** 라고 대화를 시작하시면 됩니다!
 
 ---
 
 ## 💡 엔터프라이즈 레벨 트러블슈팅 (Troubleshooting)
-본 프로젝트는 단순 튜토리얼 봇 작성을 넘어, 실제 LLM을 산업에 도입했을 때 터지는 **'환각, DB 충돌, 키워드 검색 맹점'** 등을 직접 겪으며 코드를 디버깅하고 고도화한 "실무 지향적 코딩 방식"으로 제작되었습니다. 
+
+본 프로젝트는 단순 튜토리얼 봇 작성을 넘어, 실제 LLM을 산업에 도입했을 때 터지는 **'환각, DB 충돌, 키워드 검색 맹점'** 등을 직접 겪으며 코드를 디버깅하고 고도화한 "실무 지향적 코딩 방식"으로 제작되었습니다.
 
 상세한 버그 분석 및 해결 아키텍처는 아래 문서를 참고해주세요.
+
 - [01. 인공지능 컨텍스트 기억 상실 에러](오류사항들/01.이전대화기억오류.md)
 - [02. 명시적 가드레일 부재로 인한 환각 현상 분석](오류사항들/02.환각현상.md)
 - [03. Dense Retrieval 망각 현상(DB 중첩 문제)](오류사항들/03.이전DB덮어쓰기.md)
 - [04. 1차망(Vector) 한계 극복을 위한 2차 정규식(Regex) 하이브리드 리랭킹 도입](오류사항들/04.검색키워드매칭.md)
 
 ---
+
 > **Developer:** [사용자 이름]
 > **Tech Support AI:** 율시스템 전속 AI 엔지니어링 에이전트 ('Antigravity')
