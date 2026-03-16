@@ -21,10 +21,10 @@ env/
 # Project Specific (Data & Vector DB)
 # Note: JSON mock files and manuals are kept, but the compiled ChromaDB vector store is ignored
 data/chroma_db/
-C:\YoulSystem\.env
+.env
 
-C:\YoulSystem\generate_qr.py
-C:\YoulSystem\Portfolio_AI_Copilot.docx
-C:\YoulSystem\project_proposal_youlsys.md
-C:\YoulSystem\generate_report.py
-C:\YoulSystem\github_qr.png
+generate_qr.py
+Portfolio_AI_Copilot.docx
+project_proposal_youlsys.md
+generate_report.py
+github_qr.png
