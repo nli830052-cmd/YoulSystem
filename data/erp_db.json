@@ -8,7 +8,7 @@
   },
   "T-102": {
     "name": "1구역 가스터빈 2호기",
-    "status": "정상",
+    "status": "점검 요망",
     "temperature": 47.0,
     "rpm": 88.1,
     "last_checked": "2026-03-15"
