@@ -1,0 +1,72 @@
+{
+  "T-101": {
+    "name": "1구역 가스터빈 1호기",
+    "status": "점검 요망",
+    "temperature": 86.5,
+    "rpm": 97.7,
+    "last_checked": "2026-03-16"
+  },
+  "T-102": {
+    "name": "1구역 가스터빈 2호기",
+    "status": "정상",
+    "temperature": 47.0,
+    "rpm": 88.1,
+    "last_checked": "2026-03-15"
+  },
+  "T-103": {
+    "name": "1구역 가스터빈 3호기",
+    "status": "정상",
+    "temperature": 40.6,
+    "rpm": 68.6,
+    "last_checked": "2026-03-15"
+  },
+  "V-101": {
+    "name": "1구역 밸브 1호기",
+    "status": "수리 중",
+    "pressure": 82.4,
+    "flow_rate": 58.5,
+    "last_checked": "2026-03-14"
+  },
+  "V-102": {
+    "name": "1구역 밸브 2호기",
+    "status": "수리 중",
+    "pressure": 91.1,
+    "flow_rate": 52.5,
+    "last_checked": "2026-03-14"
+  },
+  "V-103": {
+    "name": "1구역 밸브 3호기",
+    "status": "정상",
+    "pressure": 29.4,
+    "flow_rate": 32.0,
+    "last_checked": "2026-03-16"
+  },
+  "P-101": {
+    "name": "1구역 펌프 1호기",
+    "status": "정상",
+    "pressure": 47.9,
+    "vibration": 90.7,
+    "last_checked": "2026-03-16"
+  },
+  "P-102": {
+    "name": "1구역 펌프 2호기",
+    "status": "정상",
+    "pressure": 88.7,
+    "vibration": 56.6,
+    "last_checked": "2026-03-16"
+  },
+  "P-103": {
+    "name": "1구역 펌프 3호기",
+    "status": "정상",
+    "pressure": 12.0,
+    "vibration": 79.5,
+    "last_checked": "2026-03-16"
+  },
+  "C-101": {
+    "name": "1구역 컴프레서 1호기",
+    "status": "정상",
+    "pressure": 40.4,
+    "temperature": 26.8,
+    "last_checked": "2026-03-16"
+  }
+}

@@ -1,0 +1,23 @@
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# Environment Variables / Secrets
+.env
+.env.*
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project Specific (Data & Vector DB)
+# Note: JSON mock files and manuals are kept, but the compiled ChromaDB vector store is ignored
+data/chroma_db/
