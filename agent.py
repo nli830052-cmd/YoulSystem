@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 # ==========================================
 # 🛑 중요: 루트 디렉토리의 .env 파일에서 Gemini API 키를 자동으로 불러옵니다.
 # ==========================================
-load_dotenv() # .env 파일 로딩
+load_dotenv(override=True) # .env 파일 로딩 (기존 터미널 캐시를 무시하고 덮어쓰기)
 
 if not os.environ.get("GOOGLE_API_KEY"):
     raise ValueError("🚨 환경 변수에 'GOOGLE_API_KEY'가 설정되지 않았습니다. .env 파일을 확인해주세요.")
