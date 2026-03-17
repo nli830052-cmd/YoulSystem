@@ -1,11 +1,11 @@
-# 🏭 율시스템 I3D 플랜트 유지보수 AI Copilot
+# 🏭 율시스템 I3D 플랜트 유지보수 AI Chatbot
 
 ![Streamlit UI Concept](https://img.shields.io/badge/Streamlit-UI-FF4B4B.svg?style=flat&logo=streamlit&logoColor=white)
 ![LangChain](https://img.shields.io/badge/LangChain-ReAct_Agent-1C3C3C.svg?style=flat&logo=langchain&logoColor=white)
 ![Gemini 2.5 Pro](https://img.shields.io/badge/Gemini-2.5_Pro-8E75B2.svg?style=flat&logo=google&logoColor=white)
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_DB-FF9D00.svg?style=flat&logo=chroma&logoColor=white)
 
-복잡한 산업용 플랜트 현장에서 발생하는 수많은 설비 경고와 유지보수 메뉴얼을, AI(LLM)가 스스로 확인하고 진단하여 조치까지 취해주는 **설비 유지보수 자율 Agent (Copilot)** 데모 프로젝트입니다.
+복잡한 산업용 플랜트 현장에서 발생하는 수많은 설비 경고와 유지보수 메뉴얼을, AI(LLM)가 스스로 확인하고 진단하여 조치까지 취해주는 **설비 유지보수 자율 Agent (chatbot)** 데모 프로젝트입니다.
 
 사내망(온프라미스/로컬) ERP 데이터베이스와 3D 디지털 트윈 뷰어 장비를 통합 제어하는 **MCP(Model Context Protocol)** 철학을 흉내 내어, 언어 모델이 로컬 시스템의 데이터 상태를 직접 조회하고 조작할 수 있도록 구현되었습니다.
 
